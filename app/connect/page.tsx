@@ -10,38 +10,28 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { GoogleIcon, OtherIcon, OutlookIcon } from "@/lib/customIcons";
-import { GoogleLogin } from "@react-oauth/google";
+import {
+  GoogleCalendarIcon,
+  OtherCalendarIcon,
+  OutlookCalendarIcon,
+} from "@/lib/customIcons";
 
-type Provider = {
-  id: string;
-  name: string;
-  Icon: React.ReactNode;
-  subtitle?: string;
-  action?: () => Promise<void>;
+const onGoogleLogin = async () => {
+  const response = await fetch("/api/auth/google", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({}),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to connect Google calendar");
+  }
+
+  const { url } = await response.json();
+  window.location.href = url;
 };
-
-const PROVIDERS: Provider[] = [
-  {
-    id: "google",
-    name: "Google Calendar",
-    Icon: <GoogleIcon />,
-    subtitle: "Google",
-  },
-  {
-    id: "outlook",
-    name: "Outlook Calendar",
-    Icon: <OutlookIcon />,
-    subtitle: "Microsoft",
-  },
-  {
-    id: "other",
-    name: "Import .ics",
-    Icon: <OtherIcon />,
-    subtitle: "If your calendar can't sync",
-    action: async () => {},
-  },
-];
 
 export default function ConnectCalendarsPage() {
   return (
@@ -55,10 +45,30 @@ export default function ConnectCalendarsPage() {
 
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <GoogleLogin
-                onSuccess={(e) => console.log(e)}
-                onError={() => console.log("Failed")}
-              />
+              <Button
+                key={"google"}
+                variant="outline"
+                className="w-full h-14 flex items-center justify-between px-4 rounded-lg"
+                onClick={onGoogleLogin}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-md bg-white shadow-sm">
+                    <p aria-hidden>
+                      <p>
+                        <GoogleCalendarIcon />
+                      </p>
+                    </p>
+                    <p style={{ marginTop: -36 }} />
+                  </div>
+
+                  <div className="text-left">
+                    <div className="text-sm text-slate-900">
+                      Google Calendar
+                    </div>
+                    <div className="text-xs text-slate-500">Google</div>
+                  </div>
+                </div>
+              </Button>
               <Button
                 key={"outlook"}
                 variant="outline"
@@ -68,7 +78,7 @@ export default function ConnectCalendarsPage() {
                   <div className="flex items-center justify-center w-10 h-10 rounded-md bg-white shadow-sm">
                     <p aria-hidden>
                       <p>
-                        <OutlookIcon />
+                        <OutlookCalendarIcon />
                       </p>
                     </p>
                     <p style={{ marginTop: -36 }} />
@@ -91,7 +101,7 @@ export default function ConnectCalendarsPage() {
                   <div className="flex items-center justify-center w-10 h-10 rounded-md bg-white shadow-sm">
                     <p aria-hidden>
                       <p>
-                        <OtherIcon />
+                        <OutlookCalendarIcon />
                       </p>
                     </p>
                     <p style={{ marginTop: -36 }} />

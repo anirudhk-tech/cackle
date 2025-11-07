@@ -1,4 +1,4 @@
-export const GoogleIcon = ({ size = 24 }: { size?: number }) => (
+export const GoogleCalendarIcon = ({ size = 24 }: { size?: number }) => (
   <svg
     width={size}
     height={size}
@@ -13,7 +13,7 @@ export const GoogleIcon = ({ size = 24 }: { size?: number }) => (
   </svg>
 );
 
-export const OutlookIcon = ({ size = 24 }: { size?: number }) => (
+export const OutlookCalendarIcon = ({ size = 24 }: { size?: number }) => (
   <svg
     width={size}
     height={size}
@@ -27,7 +27,7 @@ export const OutlookIcon = ({ size = 24 }: { size?: number }) => (
   </svg>
 );
 
-export const OtherIcon = ({ size = 24 }: { size?: number }) => (
+export const OtherCalendarIcon = ({ size = 24 }: { size?: number }) => (
   <svg
     width={size}
     height={size}

@@ -1,7 +1,5 @@
 "use client";
 
-import React from "react";
-
 import {
   Card,
   CardContent,
@@ -10,11 +8,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  GoogleCalendarIcon,
-  OtherCalendarIcon,
-  OutlookCalendarIcon,
-} from "@/lib/customIcons";
+import { GoogleCalendarIcon, OutlookCalendarIcon } from "@/lib/customIcons";
 
 const onGoogleLogin = async () => {
   const response = await fetch("/api/auth/google", {

@@ -10,6 +10,7 @@ export default function AuthPage() {
       <div className="w-full max-w-md sm:max-w-lg md:max-w-xl">
         <Auth
           providers={["google"]}
+          redirectTo={"http://localhost:3000/callback/google"}
           supabaseClient={supabase}
           appearance={{
             theme: customSupabaseTheme,

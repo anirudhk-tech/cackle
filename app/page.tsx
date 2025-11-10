@@ -2,14 +2,30 @@
 
 import { Button } from "@/components/ui/button";
 import { tailwindColors } from "@/lib/colors/colors";
+import { setUser } from "@/lib/store/slices/authSlice";
+import { MainState } from "@/lib/store/store";
+import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
 
 export default function Home() {
   const router = useRouter();
+  const dispatch = useDispatch();
 
-  const handleCtaClick = () => {
-    router.push("/auth");
-  };
+  useEffect(() => {
+    const checkUser = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      dispatch(setUser(session?.user || null));
+
+      if (!session) {
+        router.push("/auth");
+      }
+    };
+    checkUser();
+  }, []);
 
   return (
     <div
@@ -24,7 +40,7 @@ export default function Home() {
 
       <Button
         className={`${tailwindColors.primary} ${tailwindColors.primaryAccent} text-white px-8 py-4 text-lg`}
-        onClick={handleCtaClick}
+        onClick={() => router.push("/link")}
       >
         Create Your Free Cackle Link →
       </Button>

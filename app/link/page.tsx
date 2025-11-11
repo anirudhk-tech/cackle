@@ -10,42 +10,33 @@ export default function LinkPage() {
   const [link, setLink] = useState("");
   const user = useSelector((state: MainState) => state.auth.user);
 
-  const fetchLink = async () => {
-    if (!user) {
-      console.log("User not found");
-      return;
-    }
-
-    const response = await fetch("/api/supabase/link", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ userId: user.id }),
-    });
-
-    const data = await response.json();
-
-    if (data.error) {
-      console.error(data.error);
-      return;
-    }
-
-    console.log(data);
-
-    setLink(data.link);
-  };
-
   const copyToClipboard = () => {
     navigator.clipboard.writeText(link);
     alert("Link copied! Share it with your friends.");
   };
 
   useEffect(() => {
-    if (!user) {
-      console.log("User not found");
-      return;
-    }
+    const fetchLink = async () => {
+      if (link.length) return; // link already exists
+
+      const response = await fetch("/api/supabase/link", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId: user?.id }),
+      });
+
+      const data = await response.json();
+
+      if (data.error) {
+        console.error(data.error);
+        return;
+      }
+
+      setLink(data.link);
+    };
+
     fetchLink();
   }, [user]);
 
@@ -60,16 +51,16 @@ export default function LinkPage() {
         Copy the link below and send it to your friends!
       </p>
 
-      <div className="flex gap-2">
+      <div className="flex flex-wrap justify-center items-center gap-2">
         <input
           type="text"
           value={link}
           disabled
-          className="px-4 py-3 w-96 rounded-md border border-gray-300 text-gray-900 focus:outline-none bg-gray-100"
+          className="px-4 py-3 w-70 border border-gray-300 text-gray-900 focus:outline-none bg-gray-100 text-center"
         />
         <button
           onClick={copyToClipboard}
-          className={`px-6 py-3 rounded-md ${tailwindColors.primary} ${tailwindColors.primaryAccent} ${tailwindColors.buttonText}`}
+          className={`px-6 py-3.5 ${tailwindColors.primary} ${tailwindColors.primaryAccent} ${tailwindColors.buttonText}`}
         >
           Copy
         </button>

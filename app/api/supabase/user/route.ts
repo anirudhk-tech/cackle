@@ -1,9 +1,9 @@
 import { supabase } from "@/lib/supabase";
 
 export async function POST(req: Request) {
-  const { accessToken, userMetadata } = await req.json();
+  const { accessToken, user } = await req.json();
 
-  if (!accessToken || !userMetadata) {
+  if (!accessToken || !user) {
     return new Response("Access token or user metadata not found", {
       status: 404,
     });
@@ -13,9 +13,10 @@ export async function POST(req: Request) {
     .from("users")
     .upsert(
       {
-        email: userMetadata.email,
-        name: userMetadata.full_name || null,
-        avatar_url: userMetadata.avatar_url || null,
+        id: user.id,
+        email: user.user_metadata.email,
+        name: user.user_metadata.full_name || null,
+        avatar_url: user.user_metadata.avatar_url || null,
       },
       {
         onConflict: "email",
@@ -26,7 +27,9 @@ export async function POST(req: Request) {
 
   if (userError) {
     console.error("Failed to create user:", userError);
-    return new Response("Failed to create user", { status: 500 });
+    return new Response(JSON.stringify({ error: "Failed to create user" }), {
+      status: 500,
+    });
   }
 
   return new Response(JSON.stringify(data), { status: 200 });

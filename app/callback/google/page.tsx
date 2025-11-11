@@ -21,15 +21,13 @@ export default function GoogleCallbackPage() {
       return;
     }
 
-    const userMetadata = user.user_metadata;
-
-    if (accessToken && userMetadata) {
+    if (accessToken && user) {
       const response = await fetch("/api/supabase/user", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ accessToken, userMetadata }),
+        body: JSON.stringify({ accessToken, user }),
       });
 
       const data = await response.json();

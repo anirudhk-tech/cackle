@@ -2,9 +2,12 @@
 
 import { tailwindColors } from "@/lib/colors/colors";
 import { getRandomUsername } from "@/lib/getRandomUsername";
+import { useRef } from "react";
 import { FaGoogle, FaMicrosoft, FaCalendarAlt } from "react-icons/fa";
 
 export default function GroupLinkPage() {
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
   const handleGoogleSync = async () => {
     const response = await fetch("/api/sync/google-calendar-sync", {
       method: "GET",
@@ -19,6 +22,47 @@ export default function GroupLinkPage() {
 
     const { url } = await response.json();
     window.location.href = url;
+  };
+
+  const handleManualSync = async () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.target?.result;
+      if (typeof text === "string") {
+        fetch("/api/sync/ics-sync", {
+          method: "POST",
+          headers: {
+            "Content-Type": "text/calendar",
+          },
+          body: text,
+        })
+          .then((res) => {
+            if (!res.ok) {
+              throw new Error("Failed to sync ICS file");
+            }
+            return res.json();
+          })
+          .then((data) => {
+            console.log("Synced ICS file:", data);
+          })
+          .catch((error) => {
+            console.error("Error syncing ICS file:", error);
+          });
+      }
+    };
+
+    reader.readAsText(file);
   };
 
   return (
@@ -72,10 +116,18 @@ export default function GroupLinkPage() {
             <button
               className={`flex items-center gap-2 px-4 py-2 rounded bg-white border ${tailwindColors.border} text-gray-700 hover:bg-orange-100 transition`}
               aria-label="Manual Calendar Import"
+              onClick={handleManualSync}
             >
               <FaCalendarAlt className="text-orange-500 text-xl" />
               <span className="text-sm">Upload .ics</span>
             </button>
+            <input
+              type="file"
+              accept=".ics"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              style={{ display: "none" }}
+            />
           </div>
         </div>
 

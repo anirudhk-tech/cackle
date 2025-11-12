@@ -21,5 +21,25 @@ export async function GET(req: Request) {
     orderBy: "startTime",
   });
 
+  if (!events.data.items) {
+    return Response.json({ events: [] });
+  }
+
+  const parsedEvents = [];
+
+  for (const event of events.data.items) {
+    parsedEvents.push({
+      id: event.iCalUID || event.id,
+      summary: event.summary,
+      description: event.description,
+      location: event.location,
+      start: event.start?.dateTime || event.start,
+      end: event.end?.dateTime || event.end,
+      recurringEventId: event.recurringEventId || null,
+      originalStartTime: event.originalStartTime?.dateTime || null,
+      timeZone: event.start?.timeZone || null,
+    });
+  }
+
   return Response.json({ events: events.data.items });
 }

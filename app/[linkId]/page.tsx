@@ -5,6 +5,22 @@ import { getRandomUsername } from "@/lib/getRandomUsername";
 import { FaGoogle, FaMicrosoft, FaCalendarAlt } from "react-icons/fa";
 
 export default function GroupLinkPage() {
+  const handleGoogleSync = async () => {
+    const response = await fetch("/api/sync/google-calendar-sync", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to connect Google calendar");
+    }
+
+    const { url } = await response.json();
+    window.location.href = url;
+  };
+
   return (
     <div className="flex flex-row h-screen w-screen">
       {/* Left blank side */}
@@ -39,6 +55,7 @@ export default function GroupLinkPage() {
         <div className="mt-4 mb-6">
           <div className="flex flex-col gap-3">
             <button
+              onClick={handleGoogleSync}
               className={`flex items-center gap-2 px-4 py-2 rounded bg-white border ${tailwindColors.border} text-gray-700 hover:bg-orange-100 transition`}
               aria-label="Sync with Google Calendar"
             >

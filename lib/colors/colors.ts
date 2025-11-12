@@ -9,10 +9,9 @@ export const colors = {
 };
 
 export const tailwindColors = {
-  primary: "bg-orange-500",
+  primary: "bg-orange-500", // buttons and highlights
   primaryAccent: "hover:bg-orange-600",
-  buttonText: "text-white",
-  backgroundLight: "bg-gray-50",
-  textLight: "text-gray-900",
-  textSubtle: "text-gray-600",
+  border: "border-orange-300",
+  text: "text-orange-700",
+  backgroundLight: "bg-orange-50",
 };

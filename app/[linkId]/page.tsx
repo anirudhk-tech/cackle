@@ -1,16 +1,10 @@
 "use client";
 
-import { AuthUi } from "@/components/ui/authui";
 import { tailwindColors } from "@/lib/colors/colors";
 import { getRandomUsername } from "@/lib/getRandomUsername";
-import { Auth } from "@supabase/auth-ui-react";
-import { useParams } from "next/navigation";
 import { FaGoogle, FaMicrosoft, FaCalendarAlt } from "react-icons/fa";
 
 export default function GroupLinkPage() {
-  const params = useParams();
-  const linkId = params.linkId as string;
-
   return (
     <div className="flex flex-row h-screen w-screen">
       {/* Left blank side */}
@@ -37,7 +31,7 @@ export default function GroupLinkPage() {
         </h2>
         <div className="mb-2">
           <p className="text-sm text-gray-500">
-            Without a profile, you'll need to sync calendars each time.
+            {`Without a profile, you'll need to sync calendars each time.`}
           </p>
         </div>
 

@@ -1,37 +1,19 @@
-import ical from "node-ical";
+import { expandIcsForRange, getNext7Days } from "@/lib/events";
 
 export async function POST(request: Request) {
   const icsText = await request.text();
+  const days = getNext7Days();
+  const weekStart = days[0];
+  const weekEnd = new Date(
+    days[6].getFullYear(),
+    days[6].getMonth(),
+    days[6].getDate(),
+    23,
+    59,
+    59,
+  );
 
-  const events = ical.parseICS(icsText);
-  const parsedEvents = [];
-
-  for (const key in events) {
-    const event = events[key];
-    if (event.type === "VEVENT") {
-      let recurringEventId = null;
-
-      if (event.rrule) {
-        recurringEventId = event.rrule.toString();
-      }
-
-      parsedEvents.push({
-        id: event.uid,
-        summary: event.summary,
-        description: event.description,
-        location: event.location,
-        start: event.start.toISOString
-          ? event.start.toISOString()
-          : event.start,
-        end: event.end.toISOString ? event.end.toISOString() : event.end,
-        recurringEventId,
-        originalStartTime: null,
-        timeZone: null,
-      });
-    }
-  }
-
-  console.log("Parsed events:", parsedEvents);
+  const parsedEvents = expandIcsForRange(icsText, weekStart, weekEnd);
 
   return new Response(JSON.stringify({ events: parsedEvents }), {
     status: 200,

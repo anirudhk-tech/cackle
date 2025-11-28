@@ -1,11 +1,15 @@
 "use client";
 
+import MainGrid from "@/components/grid/main-grid";
 import { tailwindColors } from "@/lib/colors/colors";
 import { getRandomUsername } from "@/lib/getRandomUsername";
+import { useEvents } from "@/lib/hooks/useEvents";
 import { useRef } from "react";
 import { FaGoogle, FaMicrosoft, FaCalendarAlt } from "react-icons/fa";
 
 export default function GroupLinkPage() {
+  const { addEvents } = useEvents();
+
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleGoogleSync = async () => {
@@ -54,7 +58,7 @@ export default function GroupLinkPage() {
             return res.json();
           })
           .then((data) => {
-            console.log("Synced ICS file:", data);
+            addEvents(data.events);
           })
           .catch((error) => {
             console.error("Error syncing ICS file:", error);
@@ -68,7 +72,9 @@ export default function GroupLinkPage() {
   return (
     <div className="flex flex-row h-screen w-screen">
       {/* Left blank side */}
-      <div className="flex-1"></div>
+      <div className="flex-1">
+        <MainGrid />
+      </div>
 
       {/* Right sidebar */}
       <div

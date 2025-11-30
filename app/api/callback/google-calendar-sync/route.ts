@@ -1,9 +1,11 @@
 import { oAuth2Client } from "@/lib/auth/google/auth";
 import { google } from "googleapis";
+import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const code = searchParams.get("code");
+  const linkId = searchParams.get("state");
 
   if (!code) {
     return new Response("Missing code", { status: 400 });
@@ -41,5 +43,14 @@ export async function GET(req: Request) {
     });
   }
 
-  return Response.json({ events: events.data.items });
+  const res = NextResponse.redirect(new URL(`/${linkId}`, req.url));
+
+  res.cookies.set("events_payload", JSON.stringify(parsedEvents), {
+    httpOnly: false,
+    maxAge: 60,
+    path: "/",
+    sameSite: "lax",
+  });
+
+  return res;
 }

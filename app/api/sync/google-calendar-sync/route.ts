@@ -1,6 +1,8 @@
-import { googleCalendarSyncUrl } from "@/lib/auth/google/auth";
+import { getGoogleCalendarSyncUrl } from "@/lib/auth/google/auth";
 import { NextResponse } from "next/server";
 
-export async function GET() {
-  return NextResponse.json({ url: googleCalendarSyncUrl });
+export async function POST(request: Request) {
+  const data = await request.json();
+  const { linkId } = data;
+  return NextResponse.json({ url: getGoogleCalendarSyncUrl(linkId) });
 }

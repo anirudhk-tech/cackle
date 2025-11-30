@@ -11,8 +11,11 @@ export const oAuth2Client = new google.auth.OAuth2(
   REDIRECT_URI,
 );
 
-export const googleCalendarSyncUrl = oAuth2Client.generateAuthUrl({
-  access_type: "offline",
-  scope: ["https://www.googleapis.com/auth/calendar.readonly"],
-  prompt: "consent",
-});
+export const getGoogleCalendarSyncUrl = (state: string) => {
+  return oAuth2Client.generateAuthUrl({
+    access_type: "offline",
+    scope: ["https://www.googleapis.com/auth/calendar.readonly"],
+    prompt: "consent",
+    state,
+  });
+};

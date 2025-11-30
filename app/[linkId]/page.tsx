@@ -2,19 +2,23 @@
 
 import MainGrid from "@/components/grid/main-grid";
 import { tailwindColors } from "@/lib/colors/colors";
-import { getRandomUsername } from "@/lib/getRandomUsername";
 import { useEvents } from "@/lib/hooks/useEvents";
-import { useRef } from "react";
+import { useSyncCookieEvents } from "@/lib/hooks/useSyncCookieEvents";
+import { useParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { FaGoogle, FaMicrosoft, FaCalendarAlt } from "react-icons/fa";
 
 export default function GroupLinkPage() {
+  const params = useParams<{ linkId: string }>();
+  const [username, setUsername] = useState<string | null>(null);
   const { addEvents } = useEvents();
-
+  const { loading } = useSyncCookieEvents();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleGoogleSync = async () => {
     const response = await fetch("/api/sync/google-calendar-sync", {
-      method: "GET",
+      method: "POST",
+      body: JSON.stringify({ linkId: params.linkId }),
       headers: {
         "Content-Type": "application/json",
       },
@@ -69,6 +73,26 @@ export default function GroupLinkPage() {
     reader.readAsText(file);
   };
 
+  useEffect(() => {
+    const setRandomUsername = async () => {
+      const response = await fetch("api/user/random-username", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to generate random username");
+      }
+
+      const data = await response.json();
+      setUsername(data.username);
+    };
+
+    setRandomUsername();
+  }, []);
+
   return (
     <div className="flex flex-row h-screen w-screen">
       {/* Left blank side */}
@@ -87,7 +111,7 @@ export default function GroupLinkPage() {
         <div className="flex items-center space-x-3 mb-6">
           <div className="w-12 h-12 rounded-full bg-orange-200"></div>
           <span className={`font-semibold text-xl ${tailwindColors.text}`}>
-            {getRandomUsername()}
+            {username}
           </span>
         </div>
 

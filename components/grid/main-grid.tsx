@@ -9,8 +9,6 @@ const timeSlots = generateTimeSlots(96);
 const MainGrid = () => {
   const events = useSelector((state: MainState) => state.grid.events);
 
-  console.log(events);
-
   return (
     <div
       style={{

@@ -85,8 +85,8 @@ export const normalizeEventsForGrid = (
 ): GridEvent[] =>
   rawEvents
     .map((ev) => {
-      const start = new Date(ev.startDate);
-      const end = new Date(ev.endDate);
+      const start = new Date(ev.start_time);
+      const end = new Date(ev.end_time);
 
       const col = getDayCol(start, weekStart);
       if (col < 0 || col > 6) return null;
@@ -95,8 +95,8 @@ export const normalizeEventsForGrid = (
       const endRow = Math.max(startRow + 1, getDaySlot(end));
 
       return {
-        id: ev.uid,
-        title: ev.summary,
+        id: ev.id,
+        title: ev.title || "",
         col,
         startRow,
         endRow,

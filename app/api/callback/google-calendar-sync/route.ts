@@ -1,4 +1,5 @@
 import { oAuth2Client } from "@/lib/auth/google/auth";
+import { supabase } from "@/lib/supabase";
 import { google } from "googleapis";
 import { NextResponse } from "next/server";
 
@@ -31,26 +32,32 @@ export async function GET(req: Request) {
 
   for (const event of events.data.items) {
     parsedEvents.push({
-      id: event.iCalUID || event.id,
-      summary: event.summary,
+      external_id: event.iCalUID || event.id,
+      link_id: linkId,
+      provider: "google",
+      title: event.summary,
       description: event.description,
       location: event.location,
-      start: event.start?.dateTime || event.start,
-      end: event.end?.dateTime || event.end,
-      recurringEventId: event.recurringEventId || null,
-      originalStartTime: event.originalStartTime?.dateTime || null,
-      timeZone: event.start?.timeZone || null,
+      is_all_day: !!event.start?.date,
+      is_recurring:
+        Array.isArray(event.recurrence) && event.recurrence.length > 0,
+      start_time: event.start?.dateTime || event.start,
+      end_time: event.end?.dateTime || event.end,
+      recurrence_rule: event.recurrence?.[0] || null,
+      recurring_event_id: event.recurringEventId || null,
+      status: event.status || null,
+      timezone: event.start?.timeZone || null,
+      visibility: "temporary",
+      raw: event,
     });
   }
 
-  const res = NextResponse.redirect(new URL(`/${linkId}`, req.url));
+  const { error } = await supabase.from("calendar_events").insert(parsedEvents);
 
-  res.cookies.set("events_payload", JSON.stringify(parsedEvents), {
-    httpOnly: false,
-    maxAge: 60,
-    path: "/",
-    sameSite: "lax",
-  });
+  if (error) {
+    console.error("Error inserting events:", error);
+  }
 
-  return res;
+  const url = new URL(`/${linkId}`, req.url);
+  return NextResponse.redirect(url);
 }

@@ -13,6 +13,7 @@ export default function GroupLinkPage() {
   const [username, setUsername] = useState<string | null>(null);
   const { addEvents } = useEvents();
   const { loading } = useSyncCookieEvents();
+
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleGoogleSync = async () => {
@@ -36,6 +37,23 @@ export default function GroupLinkPage() {
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
+  };
+
+  const handleFillGrid = async () => {
+    const response = await fetch("/api/supabase/events", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ linkId: params.linkId }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fill grid");
+    }
+
+    const { events } = await response.json();
+    addEvents(events);
   };
 
   const handleFileChange = async (
@@ -91,6 +109,7 @@ export default function GroupLinkPage() {
     };
 
     setRandomUsername();
+    handleFillGrid();
   }, []);
 
   return (

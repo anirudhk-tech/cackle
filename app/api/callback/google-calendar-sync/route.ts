@@ -1,5 +1,6 @@
 import { oAuth2Client } from "@/lib/auth/google/auth";
 import { supabase } from "@/lib/supabase";
+import { CalendarEvent } from "@/lib/types/events";
 import { google } from "googleapis";
 import { NextResponse } from "next/server";
 

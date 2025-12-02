@@ -71,7 +71,10 @@ export default function GroupLinkPage() {
           headers: {
             "Content-Type": "text/calendar",
           },
-          body: text,
+          body: JSON.stringify({
+            linkId: params.linkId,
+            icsText: text,
+          }),
         })
           .then((res) => {
             if (!res.ok) {
@@ -79,8 +82,15 @@ export default function GroupLinkPage() {
             }
             return res.json();
           })
-          .then((data) => {
+          .then(async (data) => {
             addEvents(data.events);
+            await fetch("/api/supabase/events/add", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ events: data.events }),
+            });
           })
           .catch((error) => {
             console.error("Error syncing ICS file:", error);

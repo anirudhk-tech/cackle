@@ -86,15 +86,17 @@ const MainGrid = () => {
                         height: "100%",
                       }}
                     >
-                      {cellEvents.map((ev) => (
+                      {cellEvents.map((ev, idx) => (
                         <div
-                          key={ev.id}
+                          key={idx}
                           style={{
                             flex: 1,
                             backgroundColor: "#cce4ff",
                             fontSize: "5px",
                             overflow: "hidden",
                             textOverflow: "ellipsis",
+                            padding: "5px",
+                            gap: 0,
                           }}
                         >
                           {rowIndex === ev.startRow ? ev.title : null}

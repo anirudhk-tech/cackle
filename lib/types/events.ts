@@ -7,7 +7,7 @@ export type GridEvent = {
 };
 
 export type CalendarEvent = {
-  id: string; // uuid
+  id?: string; // uuid, if null, id is auto created in db
   link_id: string | null;
   provider: string;
   external_id: string;
@@ -34,4 +34,23 @@ export type CalendarEvent = {
   source_last_synced: string | null;
   created_at: string | null;
   updated_at: string | null;
+};
+
+export type IcalEvent = {
+  startDate: {
+    toJSDate: () => Date;
+    isDate?: boolean;
+    zone?: { tzid?: string | null } | null;
+  };
+  endDate: {
+    toJSDate: () => Date;
+  };
+  uid: string;
+  summary?: string | null;
+  description?: string | null;
+  location?: string | null;
+  status?: string | null;
+  component: {
+    getFirstPropertyValue?: (name: string) => unknown;
+  };
 };

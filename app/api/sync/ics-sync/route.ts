@@ -1,7 +1,7 @@
 import { expandIcsForRange, getNext7Days } from "@/lib/events";
 
 export async function POST(request: Request) {
-  const icsText = await request.text();
+  const { icsText, linkId } = await request.json();
   const days = getNext7Days();
   const weekStart = days[0];
   const weekEnd = new Date(
@@ -13,7 +13,7 @@ export async function POST(request: Request) {
     59,
   );
 
-  const parsedEvents = expandIcsForRange(icsText, weekStart, weekEnd);
+  const parsedEvents = expandIcsForRange(icsText, weekStart, weekEnd, linkId);
 
   return new Response(JSON.stringify({ events: parsedEvents }), {
     status: 200,

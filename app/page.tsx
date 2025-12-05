@@ -15,10 +15,11 @@ export default function Home() {
       className={`${tailwindColors.backgroundLight} min-h-screen w-full flex flex-col justify-center items-center px-6`}
     >
       <h1 className="text-4xl sm:text-6xl font-bold mb-4 text-center">
-        Stop the endless back-<span className={`${tailwindColors.highlight}`}>and-forth</span>.
+        Stop the endless back-and-forth.
       </h1>
       <p className="text-lg sm:text-2xl mb-8 text-center text-gray-700 max-w-xl">
-        Cackle syncs your calendars and lets your group pick a time that works for everyone. No accounts needed.
+        Cackle syncs your calendars and lets your group pick a time that works
+        for everyone. No accounts needed.
       </p>
 
       <Button

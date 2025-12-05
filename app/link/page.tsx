@@ -60,7 +60,7 @@ export default function LinkPage() {
         />
         <button
           onClick={copyToClipboard}
-          className={`px-6 py-3.5 ${tailwindColors.primary} ${tailwindColors.primaryAccent} ${tailwindColors.buttonText}`}
+          className={`px-6 py-3.5 ${tailwindColors.primary} ${tailwindColors.primaryAccent}`}
         >
           Copy
         </button>

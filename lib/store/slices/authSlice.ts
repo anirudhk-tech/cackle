@@ -19,9 +19,9 @@ export const authSlice = createSlice({
     clearUser(state: AuthSlice) {
       state.user = null;
     },
-    updateUser(state: AuthSlice, action: { payload: Partial<User> }) {
+    updateUser(state: AuthSlice, action: { payload: User | null }) {
       if (state.user) {
-        state.user = { ...state.user, ...action.payload };
+        state.user = action.payload;
       }
     },
   },

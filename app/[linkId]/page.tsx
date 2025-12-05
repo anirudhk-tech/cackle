@@ -2,17 +2,21 @@
 
 import MainGrid from "@/components/grid/main-grid";
 import { tailwindColors } from "@/lib/colors/colors";
+import { useAuth } from "@/lib/hooks/useAuth";
 import { useEvents } from "@/lib/hooks/useEvents";
-import { useSyncCookieEvents } from "@/lib/hooks/useSyncCookieEvents";
+import { MainState } from "@/lib/store/store";
+import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { FaGoogle, FaMicrosoft, FaCalendarAlt } from "react-icons/fa";
+import { FaGoogle, FaCalendarAlt } from "react-icons/fa";
+import { useSelector } from "react-redux";
 
 export default function GroupLinkPage() {
   const params = useParams<{ linkId: string }>();
   const [username, setUsername] = useState<string | null>(null);
   const { addEvents } = useEvents();
-  const { loading } = useSyncCookieEvents();
+  const { handleLogin, handleLogout } = useAuth();
+  const user = useSelector((state: MainState) => state.auth.user);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -138,81 +142,93 @@ export default function GroupLinkPage() {
       >
         {/* Profile section */}
         <div className="flex items-center space-x-3 mb-6">
-          <div className="w-12 h-12 rounded-full bg-orange-200"></div>
+          <Image
+            className="rounded-full bg-orange-200"
+            width={50}
+            height={50}
+            src={user ? user.user_metadata.avatar_url : "/avatar.png"}
+            alt="User Avatar"
+          />
           <span className={`font-semibold text-xl ${tailwindColors.text}`}>
-            {username}
+            {user ? user.user_metadata.full_name : username}
           </span>
         </div>
 
-        {/* Import calendars heading */}
-        <h2 className={`text-xl font-bold mb-2 ${tailwindColors.text}`}>
-          Sync your calendars
-        </h2>
-        <div className="mb-2">
-          <p className="text-sm text-gray-500">
-            {`Without a profile, you'll need to sync calendars each time.`}
-          </p>
-        </div>
+        {!user ? (
+          <>
+            <h2 className={`text-xl font-bold mb-2 ${tailwindColors.text}`}>
+              Sync your calendars
+            </h2>
+            <div className="mb-2">
+              <p className="text-sm text-gray-500">
+                {`Without a profile, you'll need to sync calendars each time.`}
+              </p>
+            </div>
 
-        {/* Calendar import section */}
-        <div className="mt-4 mb-6">
-          <div className="flex flex-col gap-3">
-            <button
-              onClick={handleGoogleSync}
-              className={`flex items-center gap-2 px-4 py-2 rounded bg-white border ${tailwindColors.border} text-gray-700 hover:bg-orange-100 transition`}
-              aria-label="Sync with Google Calendar"
-            >
-              <FaGoogle className="text-orange-500 text-xl" />
-              <span className="text-sm">Sync with Google</span>
-            </button>
-            <button
-              className={`flex items-center gap-2 px-4 py-2 rounded bg-white border ${tailwindColors.border} text-gray-700 hover:bg-orange-100 transition`}
-              aria-label="Sync with Outlook"
-            >
-              <FaMicrosoft className="text-orange-500 text-xl" />
-              <span className="text-sm">Sync with Outlook</span>
-            </button>
-            <button
-              className={`flex items-center gap-2 px-4 py-2 rounded bg-white border ${tailwindColors.border} text-gray-700 hover:bg-orange-100 transition`}
-              aria-label="Manual Calendar Import"
-              onClick={handleManualSync}
-            >
-              <FaCalendarAlt className="text-orange-500 text-xl" />
-              <span className="text-sm">Upload .ics</span>
-            </button>
-            <input
-              type="file"
-              accept=".ics"
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              style={{ display: "none" }}
-            />
+            <div className="mt-4 mb-6">
+              <div className="flex flex-col gap-3">
+                <button
+                  onClick={handleGoogleSync}
+                  className={`flex items-center gap-2 px-4 py-2 rounded bg-white border ${tailwindColors.border} text-gray-700 hover:bg-orange-100 transition`}
+                  aria-label="Sync with Google Calendar"
+                >
+                  <FaGoogle className="text-orange-500 text-xl" />
+                  <span className="text-sm">Sync with Google</span>
+                </button>
+                <button
+                  className={`flex items-center gap-2 px-4 py-2 rounded bg-white border ${tailwindColors.border} text-gray-700 hover:bg-orange-100 transition`}
+                  aria-label="Manual Calendar Import"
+                  onClick={handleManualSync}
+                >
+                  <FaCalendarAlt className="text-orange-500 text-xl" />
+                  <span className="text-sm">Upload .ics</span>
+                </button>
+                <input
+                  type="file"
+                  accept=".ics"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  style={{ display: "none" }}
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center my-4">
+              <div className={`grow border-b ${tailwindColors.border}`}></div>
+              <span className="mx-2 text-gray-500 text-sm">Or</span>
+              <div className={`grow border-b ${tailwindColors.border}`}></div>
+            </div>
+
+            <h2 className={`text-xl font-bold mb-2 ${tailwindColors.text}`}>
+              Create a profile
+            </h2>
+            <p className="text-sm text-gray-500">
+              All your calendars sync automatically for every link.
+            </p>
+
+            <div className="grow flex flex-col justify-start mt-5">
+              <button
+                className={`flex items-center justify-center gap-2 px-4 py-2 rounded ${tailwindColors.primary} ${tailwindColors.primaryAccent} text-white border ${tailwindColors.border} transition`}
+                aria-label="Login"
+                onClick={handleLogin}
+              >
+                <span className="text-sm">Login</span>
+              </button>
+            </div>
+          </>
+        ) : (
+          <div className="flex">
+            <div className="grow flex flex-col justify-start mt-5">
+              <button
+                className={`flex items-center justify-center gap-2 px-4 py-2 rounded ${tailwindColors.primary} ${tailwindColors.primaryAccent} text-white border ${tailwindColors.border} transition`}
+                aria-label="Logout"
+                onClick={handleLogout}
+              >
+                <span className="text-sm">Logout</span>
+              </button>
+            </div>
           </div>
-        </div>
-
-        {/* Divider with "Or" */}
-        <div className="flex items-center my-4">
-          <div className={`grow border-b ${tailwindColors.border}`}></div>
-          <span className="mx-2 text-gray-500 text-sm">Or</span>
-          <div className={`grow border-b ${tailwindColors.border}`}></div>
-        </div>
-
-        <h2 className={`text-xl font-bold mb-2 ${tailwindColors.text}`}>
-          Create a profile
-        </h2>
-        <p className="text-sm text-gray-500">
-          All your calendars sync automatically for every link.
-        </p>
-
-        {/* Login button */}
-        <div className="grow flex flex-col justify-start mt-5">
-          <button
-            className={`flex items-center justify-center gap-2 px-4 py-2 rounded ${tailwindColors.primary} ${tailwindColors.primaryAccent} text-white border ${tailwindColors.border} transition`}
-            aria-label="Login"
-          >
-            <span className="text-sm">Login</span>
-          </button>
-        </div>
+        )}
       </div>
     </div>
   );

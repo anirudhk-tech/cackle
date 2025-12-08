@@ -9,6 +9,7 @@ export type GridEvent = {
 export type CalendarEvent = {
   id?: string; // uuid, if null, id is auto created in db
   link_id: string | null;
+  user_id: string | null;
   provider: string;
   external_id: string;
   calendar_id: string | null;

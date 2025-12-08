@@ -6,6 +6,7 @@ export const expandIcsForRange = (
   rangeStart: Date,
   rangeEnd: Date,
   linkId: string,
+  userId?: string,
 ): CalendarEvent[] => {
   const icalExpander = new IcalExpander({
     ics: icsText,
@@ -39,6 +40,7 @@ export const expandIcsForRange = (
 
     return {
       link_id: linkId,
+      user_id: userId || null,
       provider: "ics",
       external_id: uid,
       calendar_id: null,

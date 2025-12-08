@@ -2,13 +2,10 @@
 
 import { Button } from "@/components/ui/button";
 import { tailwindColors } from "@/lib/colors/colors";
-import { useCheckUser } from "@/lib/hooks/useCheckUser";
 import { useRouter } from "next/navigation";
 
 export default function Home() {
   const router = useRouter();
-
-  useCheckUser();
 
   return (
     <div

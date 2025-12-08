@@ -1,14 +1,16 @@
 import { supabase } from "@/lib/supabase";
 import { NextResponse } from "next/server";
 
-export async function POST(request: Request) {
-  const body = await request.json();
-  const { linkId } = body;
+export async function GET(
+  request: Request,
+  { params }: { params: { id: string } },
+) {
+  const { id } = await params;
 
   const { data, error } = await supabase
     .from("calendar_events")
     .select("*")
-    .eq("link_id", linkId);
+    .eq("link_id", id);
 
   if (error) {
     console.error(error.message);

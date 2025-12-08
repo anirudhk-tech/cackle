@@ -1,6 +1,5 @@
-import { oAuth2Client } from "@/lib/auth/google/auth";
+import { anonymousOAuth2Client } from "@/lib/auth/google/auth";
 import { supabase } from "@/lib/supabase";
-import { CalendarEvent } from "@/lib/types/events";
 import { google } from "googleapis";
 import { NextResponse } from "next/server";
 
@@ -13,10 +12,13 @@ export async function GET(req: Request) {
     return new Response("Missing code", { status: 400 });
   }
 
-  const { tokens } = await oAuth2Client.getToken(code);
-  oAuth2Client.setCredentials(tokens);
+  const { tokens } = await anonymousOAuth2Client.getToken(code);
+  anonymousOAuth2Client.setCredentials(tokens);
 
-  const calendar = google.calendar({ version: "v3", auth: oAuth2Client });
+  const calendar = google.calendar({
+    version: "v3",
+    auth: anonymousOAuth2Client,
+  });
   const events = await calendar.events.list({
     calendarId: "primary",
     timeMin: new Date().toISOString(),

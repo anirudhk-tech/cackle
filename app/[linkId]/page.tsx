@@ -142,13 +142,15 @@ export default function GroupLinkPage() {
       >
         {/* Profile section */}
         <div className="flex items-center space-x-3 mb-6">
-          <Image
-            className="rounded-full bg-orange-200"
-            width={50}
-            height={50}
-            src={user ? user.user_metadata.avatar_url : "/avatar.png"}
-            alt="User Avatar"
-          />
+          {user ? (
+            <Image
+              className="rounded-full bg-orange-200"
+              width={50}
+              height={50}
+              src={user.user_metadata.avatar_url}
+              alt="User Avatar"
+            />
+          ) : null}
           <span className={`font-semibold text-xl ${tailwindColors.text}`}>
             {user ? user.user_metadata.full_name : username}
           </span>

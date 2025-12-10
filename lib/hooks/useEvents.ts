@@ -12,8 +12,8 @@ export const useEvents = ({ linkId }: { linkId: string }) => {
   const days = getNext7Days();
 
   const handleFillGrid = async () => {
-    const response = await fetch(`/api/supabase/events/link/${linkId}`, {
-      method: "POST",
+    const response = await fetch(`/api/supabase/events/get/link/${linkId}`, {
+      method: "GET",
       headers: {
         "Content-Type": "application/json",
       },

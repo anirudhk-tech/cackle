@@ -32,7 +32,7 @@ export default function LinkPage({ linkId }: { linkId: string }) {
     reader.onload = (e) => {
       const text = e.target?.result;
       if (typeof text === "string") {
-        fetch("/api/sync/ics-sync", {
+        fetch("/api/events/sync/anonymous-ics-sync", {
           method: "POST",
           headers: {
             "Content-Type": "text/calendar",

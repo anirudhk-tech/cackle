@@ -14,13 +14,16 @@ export default function AnonymousLinkPage({ linkId }: { linkId: string }) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleGoogleSync = async (linkId: string) => {
-    const response = await fetch("/api/sync/anonymous-google-calendar-sync", {
-      method: "POST",
-      body: JSON.stringify({ linkId }),
-      headers: {
-        "Content-Type": "application/json",
+    const response = await fetch(
+      "/api/supabase/events/sync/anonymous-google-calendar-sync",
+      {
+        method: "POST",
+        body: JSON.stringify({ linkId }),
+        headers: {
+          "Content-Type": "application/json",
+        },
       },
-    });
+    );
 
     if (!response.ok) {
       throw new Error("Failed to connect Google calendar");
@@ -64,7 +67,7 @@ export default function AnonymousLinkPage({ linkId }: { linkId: string }) {
           })
           .then(async (data) => {
             addEvents(data.events);
-            await fetch("/api/supabase/events/add", {
+            await fetch("/api/supabase/events/add/anonymous", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",

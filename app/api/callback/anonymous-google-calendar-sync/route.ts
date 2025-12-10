@@ -55,7 +55,9 @@ export async function GET(req: Request) {
     });
   }
 
-  const { error } = await supabase.from("calendar_events").insert(parsedEvents);
+  const { error } = await supabase
+    .from("anonymous_calendar_events")
+    .insert(parsedEvents);
 
   if (error) {
     console.error("Error inserting events:", error);

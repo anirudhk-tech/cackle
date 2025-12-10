@@ -3,14 +3,14 @@ import { createSlice } from "@reduxjs/toolkit";
 export interface UserSlice {
   userData: {
     id: string | null;
-    google_integration: boolean;
+    google_calendar_synced_at: Date | null;
   };
 }
 
 const initialState: UserSlice = {
   userData: {
     id: null,
-    google_integration: false,
+    google_calendar_synced_at: null,
   },
 };
 

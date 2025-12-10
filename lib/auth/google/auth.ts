@@ -1,4 +1,5 @@
 import { env } from "@/config";
+import { User } from "@supabase/supabase-js";
 import { google } from "googleapis";
 
 const CLIENT_ID = env.GOOGLE_CLIENT_ID;
@@ -13,8 +14,23 @@ export const anonymousOAuth2Client = new google.auth.OAuth2(
   ANONYMOUS_REDIRECT_URI,
 );
 
+export const userOAuth2Client = new google.auth.OAuth2(
+  CLIENT_ID,
+  CLIENT_SECRET,
+  REDIRECT_URI,
+);
+
 export const getGoogleCalendarSyncUrl = (state: string) => {
   return anonymousOAuth2Client.generateAuthUrl({
+    access_type: "offline",
+    scope: ["https://www.googleapis.com/auth/calendar.readonly"],
+    prompt: "consent",
+    state,
+  });
+};
+
+export const getUserGoogleCalendarSyncUrl = (state: string) => {
+  return userOAuth2Client.generateAuthUrl({
     access_type: "offline",
     scope: ["https://www.googleapis.com/auth/calendar.readonly"],
     prompt: "consent",

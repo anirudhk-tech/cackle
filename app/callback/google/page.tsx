@@ -6,6 +6,7 @@ import { useCallback, useEffect } from "react";
 
 export default function GoogleCallbackPage() {
   const router = useRouter();
+
   const createUser = useCallback(async () => {
     const hash = window.location.hash;
     const params = new URLSearchParams(hash.substring(1));

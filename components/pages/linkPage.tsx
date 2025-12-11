@@ -32,13 +32,12 @@ export default function LinkPage({ linkId }: { linkId: string }) {
     reader.onload = (e) => {
       const text = e.target?.result;
       if (typeof text === "string") {
-        fetch("/api/events/sync/anonymous-ics-sync", {
+        fetch("/api/events/sync/ics-sync", {
           method: "POST",
           headers: {
             "Content-Type": "text/calendar",
           },
           body: JSON.stringify({
-            linkId: linkId,
             userId: userData ? userData.id : null,
             icsText: text,
           }),
@@ -51,13 +50,6 @@ export default function LinkPage({ linkId }: { linkId: string }) {
           })
           .then(async (data) => {
             addEvents(data.events);
-            await fetch("/api/supabase/events/add", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ events: data.events }),
-            });
           })
           .catch((error) => {
             console.error("Error syncing ICS file:", error);
@@ -98,7 +90,7 @@ export default function LinkPage({ linkId }: { linkId: string }) {
 
         <div className="flex flex-col">
           <span className="text-sm">
-            {userData.google_integration
+            {userData.google_calendar_synced_at
               ? "You have google calendar synced!"
               : "You have not synced with google."}
           </span>
@@ -120,7 +112,7 @@ export default function LinkPage({ linkId }: { linkId: string }) {
             style={{ display: "none" }}
           />
 
-          {!userData.google_integration && (
+          {!userData.google_calendar_synced_at && (
             <div className="grow flex flex-col justify-start mt-5">
               <button
                 className={`flex items-center justify-center gap-2 px-4 py-2 rounded ${tailwindColors.primary} ${tailwindColors.primaryAccent} text-white border ${tailwindColors.border} transition`}

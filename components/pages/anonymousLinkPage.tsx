@@ -65,15 +65,8 @@ export default function AnonymousLinkPage({ linkId }: { linkId: string }) {
             }
             return res.json();
           })
-          .then(async (data) => {
+          .then((data) => {
             addEvents(data.events);
-            await fetch("/api/supabase/events/add/anonymous", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ events: data.events }),
-            });
           })
           .catch((error) => {
             console.error("Error syncing ICS file:", error);

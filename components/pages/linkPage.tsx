@@ -8,6 +8,7 @@ import { tailwindColors } from "@/lib/colors/colors";
 import Image from "next/image";
 import { User } from "@supabase/supabase-js";
 import { FaCalendarAlt } from "react-icons/fa";
+import { useRouter } from "next/navigation";
 
 export default function LinkPage({ linkId }: { linkId: string }) {
   const { addEvents } = useEvents({ linkId });
@@ -15,6 +16,7 @@ export default function LinkPage({ linkId }: { linkId: string }) {
   const user = useSelector((state: MainState) => state.auth.user) as User;
   const userData = useSelector((state: MainState) => state.user.userData);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const router = useRouter();
 
   const handleManualSync = async () => {
     if (fileInputRef.current) {
@@ -32,7 +34,7 @@ export default function LinkPage({ linkId }: { linkId: string }) {
     reader.onload = (e) => {
       const text = e.target?.result;
       if (typeof text === "string") {
-        fetch("/api/events/sync/ics-sync", {
+        fetch("/api/supabase/events/sync/ics-sync", {
           method: "POST",
           headers: {
             "Content-Type": "text/calendar",
@@ -62,7 +64,6 @@ export default function LinkPage({ linkId }: { linkId: string }) {
 
   return (
     <div className="flex flex-row h-screen w-screen">
-      {/* Left blank side */}
       <div className="flex-1">
         <MainGrid />
       </div>
@@ -89,12 +90,6 @@ export default function LinkPage({ linkId }: { linkId: string }) {
         </div>
 
         <div className="flex flex-col">
-          <span className="text-sm">
-            {userData.google_calendar_synced_at
-              ? "You have google calendar synced!"
-              : "You have not synced with google."}
-          </span>
-
           <button
             className={`flex items-center gap-2 mt-2 px-4 py-2 rounded bg-white border ${tailwindColors.border} text-gray-700 hover:bg-orange-100 transition`}
             aria-label="Manual Calendar Import"
@@ -117,7 +112,7 @@ export default function LinkPage({ linkId }: { linkId: string }) {
               <button
                 className={`flex items-center justify-center gap-2 px-4 py-2 rounded ${tailwindColors.primary} ${tailwindColors.primaryAccent} text-white border ${tailwindColors.border} transition`}
                 aria-label="Sync with Google Calendar"
-                onClick={() => {}}
+                onClick={() => router.push("/profile")}
               >
                 <span className="text-sm">Sync with Google Calendar</span>
               </button>

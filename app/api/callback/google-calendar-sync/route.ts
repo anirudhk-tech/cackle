@@ -19,6 +19,7 @@ export async function GET(req: Request) {
     version: "v3",
     auth: userOAuth2Client,
   });
+
   const events = await calendar.events.list({
     calendarId: "primary",
     timeMin: new Date().toISOString(),
@@ -55,15 +56,34 @@ export async function GET(req: Request) {
     });
   }
 
-  const { error } = await supabase.from("calendar_events").insert(parsedEvents);
+  const { error: eventError } = await supabase
+    .from("calendar_events")
+    .insert(parsedEvents);
 
   const { error: userError } = await supabase
     .from("users")
     .update({ google_calendar_synced_at: new Date() })
     .eq("id", userId);
 
-  if (error) {
-    console.error("Error inserting events:", error);
+  const { error: tokenError } = await supabase
+    .from("user_tokens")
+    .upsert({
+      user_id: userId,
+      provider: "google",
+      access_token: tokens.access_token,
+      refresh_token: tokens.refresh_token,
+      expiry_date: tokens.expiry_date ?? null,
+      created_at: new Date(),
+      updated_at: new Date(),
+    })
+    .eq("user_id", userId);
+
+  if (tokenError) {
+    console.error("Error inserting tokens:", tokenError);
+  }
+
+  if (eventError) {
+    console.error("Error inserting events:", eventError);
   }
 
   if (userError) {

@@ -1,8 +1,9 @@
 import { combineSlices, configureStore } from "@reduxjs/toolkit";
 import { authSlice } from "./slices/authSlice";
 import { gridSlice } from "./slices/gridSlice";
+import { userSlice } from "./slices/userSlice";
 
-const rootReducer = combineSlices(authSlice, gridSlice);
+const rootReducer = combineSlices(authSlice, gridSlice, userSlice);
 
 export type MainState = ReturnType<typeof rootReducer>;
 

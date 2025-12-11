@@ -2,12 +2,12 @@
 
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 
 export default function GoogleCallbackPage() {
   const router = useRouter();
 
-  const createUser = async () => {
+  const createUser = useCallback(async () => {
     const hash = window.location.hash;
     const params = new URLSearchParams(hash.substring(1));
     const accessToken = params.get("access_token");
@@ -31,19 +31,18 @@ export default function GoogleCallbackPage() {
         body: JSON.stringify({ accessToken, user }),
       });
 
-      const data = await response.json();
-
-      if (data.error) {
-        console.error(data.error);
-      } else {
-        router.push("/connect");
+      if (!response.ok) {
+        console.error("Failed to create user");
+        return;
       }
+
+      router.push("/profile");
     }
-  };
+  }, [router]);
 
   useEffect(() => {
     createUser();
-  }, []);
+  }, [createUser]);
 
   return (
     <div className="flex items-center justify-center h-screen">

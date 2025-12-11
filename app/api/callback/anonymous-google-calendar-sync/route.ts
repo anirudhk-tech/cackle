@@ -1,4 +1,4 @@
-import { userOAuth2Client } from "@/lib/auth/google/auth";
+import { anonymousOAuth2Client } from "@/lib/auth/google/auth";
 import { supabase } from "@/lib/supabase";
 import { google } from "googleapis";
 import { NextResponse } from "next/server";
@@ -6,20 +6,19 @@ import { NextResponse } from "next/server";
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const code = searchParams.get("code");
-  const userId = searchParams.get("state");
+  const linkId = searchParams.get("state");
 
   if (!code) {
     return new Response("Missing code", { status: 400 });
   }
 
-  const { tokens } = await userOAuth2Client.getToken(code);
-  userOAuth2Client.setCredentials(tokens);
+  const { tokens } = await anonymousOAuth2Client.getToken(code);
+  anonymousOAuth2Client.setCredentials(tokens);
 
   const calendar = google.calendar({
     version: "v3",
-    auth: userOAuth2Client,
+    auth: anonymousOAuth2Client,
   });
-
   const events = await calendar.events.list({
     calendarId: "primary",
     timeMin: new Date().toISOString(),
@@ -37,7 +36,7 @@ export async function GET(req: Request) {
   for (const event of events.data.items) {
     parsedEvents.push({
       external_id: event.iCalUID || event.id,
-      user_id: userId,
+      link_id: linkId,
       provider: "google",
       title: event.summary,
       description: event.description,
@@ -56,40 +55,14 @@ export async function GET(req: Request) {
     });
   }
 
-  const { error: eventError } = await supabase
-    .from("calendar_events")
+  const { error } = await supabase
+    .from("anonymous_calendar_events")
     .insert(parsedEvents);
 
-  const { error: userError } = await supabase
-    .from("users")
-    .update({ google_calendar_synced_at: new Date() })
-    .eq("id", userId);
-
-  const { error: tokenError } = await supabase
-    .from("user_tokens")
-    .upsert({
-      user_id: userId,
-      provider: "google",
-      access_token: tokens.access_token,
-      refresh_token: tokens.refresh_token,
-      expiry_date: tokens.expiry_date ?? null,
-      created_at: new Date(),
-      updated_at: new Date(),
-    })
-    .eq("user_id", userId);
-
-  if (tokenError) {
-    console.error("Error inserting tokens:", tokenError);
+  if (error) {
+    console.error("Error inserting events:", error);
   }
 
-  if (eventError) {
-    console.error("Error inserting events:", eventError);
-  }
-
-  if (userError) {
-    console.error("Error updating user:", userError);
-  }
-
-  const url = new URL(`/profile`, req.url);
+  const url = new URL(`/${linkId}`, req.url);
   return NextResponse.redirect(url);
 }

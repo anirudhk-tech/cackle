@@ -1,12 +1,18 @@
 import IcalExpander from "ical-expander";
-import { CalendarEvent, GridEvent, IcalEvent } from "./types/events";
+import {
+  AnonymousCalendarEvent,
+  CalendarEvent,
+  GridEvent,
+  IcalEvent,
+} from "./types/events";
 
 export const expandIcsForRange = (
   icsText: string,
   rangeStart: Date,
   rangeEnd: Date,
   linkId: string,
-): CalendarEvent[] => {
+  userId?: string,
+): (AnonymousCalendarEvent | CalendarEvent)[] => {
   const icalExpander = new IcalExpander({
     ics: icsText,
     maxIterations: 1000,
@@ -23,7 +29,9 @@ export const expandIcsForRange = (
     return t?.zone?.tzid || null;
   };
 
-  const mapIcalEventToCalendarEvent = (e: IcalEvent): CalendarEvent => {
+  const mapIcalEventToCalendarEvent = (
+    e: IcalEvent,
+  ): AnonymousCalendarEvent | CalendarEvent => {
     const jsStart = e.startDate.toJSDate();
     const jsEnd = e.endDate.toJSDate();
     const timezone = getTimezoneFromIcalTime(e.startDate);
@@ -36,6 +44,38 @@ export const expandIcsForRange = (
         jsEnd.getUTCMinutes() === 0);
 
     const uid = e.uid;
+
+    if (userId) {
+      // if userId, user associated, otherwise link associated
+      return {
+        user_id: userId,
+        provider: "ics",
+        external_id: uid,
+        calendar_id: null,
+
+        title: e.summary || null,
+        description: e.description || null,
+        location: e.location || null,
+
+        start_time: jsStart.toISOString(),
+        end_time: jsEnd.toISOString(),
+        timezone,
+
+        is_all_day: isAllDay,
+        is_recurring: !!e.component.getFirstPropertyValue?.("rrule"),
+        recurrence_rule:
+          (e.component.getFirstPropertyValue?.("rrule") as string) || null,
+        recurring_event_id: null,
+
+        status: e.status || "confirmed",
+        visibility: "public",
+
+        raw: e,
+        source_last_synced: new Date().toISOString(),
+        created_at: null,
+        updated_at: null,
+      };
+    }
 
     return {
       link_id: linkId,
@@ -67,56 +107,52 @@ export const expandIcsForRange = (
     };
   };
 
-  const baseEvents: CalendarEvent[] = results.events.map(
-    mapIcalEventToCalendarEvent,
-  );
+  const baseEvents = results.events.map(mapIcalEventToCalendarEvent);
 
-  const recurringEvents: CalendarEvent[] = results.occurrences.map(
-    (o, index: number) => {
-      const jsStart = o.startDate.toJSDate();
-      const jsEnd = o.endDate.toJSDate();
-      const timezone = getTimezoneFromIcalTime(o.startDate);
+  const recurringEvents = results.occurrences.map((o, index: number) => {
+    const jsStart = o.startDate.toJSDate();
+    const jsEnd = o.endDate.toJSDate();
+    const timezone = getTimezoneFromIcalTime(o.startDate);
 
-      const isAllDay =
-        o.startDate.isDate ||
-        (jsStart.getUTCHours() === 0 &&
-          jsStart.getUTCMinutes() === 0 &&
-          jsEnd.getUTCHours() === 0 &&
-          jsEnd.getUTCMinutes() === 0);
+    const isAllDay =
+      o.startDate.isDate ||
+      (jsStart.getUTCHours() === 0 &&
+        jsStart.getUTCMinutes() === 0 &&
+        jsEnd.getUTCHours() === 0 &&
+        jsEnd.getUTCMinutes() === 0);
 
-      const baseUid = o.item.uid;
-      const uid = `${baseUid}-${o.recurrenceId?.toString() || index}`;
+    const baseUid = o.item.uid;
+    const uid = `${baseUid}-${o.recurrenceId?.toString() || index}`;
 
-      return {
-        link_id: linkId,
-        provider: "ics",
-        external_id: uid,
-        calendar_id: null,
+    return {
+      link_id: linkId,
+      provider: "ics",
+      external_id: uid,
+      calendar_id: null,
 
-        title: o.item.summary || null,
-        description: o.item.description || null,
-        location: o.item.location || null,
+      title: o.item.summary || null,
+      description: o.item.description || null,
+      location: o.item.location || null,
 
-        start_time: jsStart.toISOString(),
-        end_time: jsEnd.toISOString(),
-        timezone,
+      start_time: jsStart.toISOString(),
+      end_time: jsEnd.toISOString(),
+      timezone,
 
-        is_all_day: isAllDay,
-        is_recurring: true,
-        recurrence_rule:
-          o.item.component.getFirstPropertyValue?.("rrule") || null,
-        recurring_event_id: baseUid,
+      is_all_day: isAllDay,
+      is_recurring: true,
+      recurrence_rule:
+        o.item.component.getFirstPropertyValue?.("rrule") || null,
+      recurring_event_id: baseUid,
 
-        status: o.item.status || "confirmed",
-        visibility: "public",
+      status: o.item.status || "confirmed",
+      visibility: "public",
 
-        raw: o,
-        source_last_synced: new Date().toISOString(),
-        created_at: null,
-        updated_at: null,
-      };
-    },
-  );
+      raw: o,
+      source_last_synced: new Date().toISOString(),
+      created_at: null,
+      updated_at: null,
+    };
+  });
 
   return [...baseEvents, ...recurringEvents];
 };

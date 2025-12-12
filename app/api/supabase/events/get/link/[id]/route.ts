@@ -8,7 +8,7 @@ export async function GET(
   const { id } = await params;
 
   const { data, error } = await supabase
-    .from("anonymous_calendar_events")
+    .from("link_calendar_events")
     .select("*")
     .eq("link_id", id);
 

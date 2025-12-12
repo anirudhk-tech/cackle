@@ -18,7 +18,7 @@ export default function LinkPage({ linkId }: { linkId: string }) {
   const userData = useSelector((state: MainState) => state.user.userData);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const router = useRouter();
-  const { syncing } = useSync();
+  const { syncing } = useSync({ linkId });
 
   const handleManualSync = async () => {
     if (fileInputRef.current) {

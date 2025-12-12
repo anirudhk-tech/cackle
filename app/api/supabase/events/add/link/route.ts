@@ -6,8 +6,8 @@ export async function POST(request: Request) {
   const { events } = body;
 
   const { error } = await supabase
-    .from("anonymous_calendar_events")
-    .insert(events);
+    .from("link_calendar_events")
+    .upsert(events, { onConflict: "external_id" });
 
   if (error) {
     console.error(error);

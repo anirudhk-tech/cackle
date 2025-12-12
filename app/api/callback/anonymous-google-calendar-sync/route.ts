@@ -56,7 +56,7 @@ export async function GET(req: Request) {
   }
 
   const { error } = await supabase
-    .from("anonymous_calendar_events")
+    .from("link_calendar_events")
     .insert(parsedEvents);
 
   if (error) {

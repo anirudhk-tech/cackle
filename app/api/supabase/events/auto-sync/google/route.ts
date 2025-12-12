@@ -26,7 +26,6 @@ export async function POST(req: Request) {
     }
 
     userOAuth2Client.setCredentials({
-      access_token: userRow.access_token,
       refresh_token: userRow.refresh_token,
     });
 
@@ -92,7 +91,7 @@ export async function POST(req: Request) {
       console.error("Error updating user:", userError);
     }
 
-    return NextResponse.json({ ok: true, count: parsedEvents.length });
+    return NextResponse.json({ ok: true, events: parsedEvents });
   } catch (err) {
     console.error("auto-sync error:", err);
     return NextResponse.json({ error: "Internal error" }, { status: 500 });

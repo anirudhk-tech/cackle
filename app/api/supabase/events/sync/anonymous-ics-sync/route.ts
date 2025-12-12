@@ -17,7 +17,7 @@ export async function POST(request: Request) {
   const parsedEvents = expandIcsForRange(icsText, weekStart, weekEnd, linkId);
 
   const { error } = await supabase
-    .from("anonymous_calendar_events")
+    .from("link_calendar_events")
     .insert(parsedEvents);
 
   if (error) {

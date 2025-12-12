@@ -11,6 +11,7 @@ export async function POST(req: Request) {
   const url = urlStart + urlEnd;
 
   const { error } = await supabase.from("links").insert({
+    id: urlEnd,
     user_id: userId ?? null,
     link: url,
   });

@@ -1,5 +1,6 @@
 export type GridEvent = {
   id: string;
+  external_id: string;
   title: string;
   col: number;
   startRow: number;

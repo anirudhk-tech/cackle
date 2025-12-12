@@ -207,7 +207,7 @@ export const getDaySlot = (date: Date) => {
 };
 
 export const normalizeEventsForGrid = (
-  rawEvents: CalendarEvent[],
+  rawEvents: AnonymousCalendarEvent[],
   weekStart: Date,
 ): GridEvent[] =>
   rawEvents
@@ -223,6 +223,7 @@ export const normalizeEventsForGrid = (
 
       return {
         id: ev.id,
+        external_id: ev.external_id,
         title: ev.title || "",
         col,
         startRow,
